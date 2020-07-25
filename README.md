@@ -1,8 +1,5 @@
 Read Me
 
-Overview
-Motivation:
-The
 Planned functionality:
 
 1. 4 channel expansion ports
@@ -12,4 +9,6 @@ Planned functionality:
 5. Temperature sensor using Spektrum head sensor
 6. Temperature sensor using temperature sensors sold for 3d printers
 
-Planned compatibility
+Status:
+Just under initial devlopment.
+HW being used for initial development is a Teensy 3.2, DX9, AR637T
