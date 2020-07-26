@@ -46,21 +46,21 @@ unsigned long prevUartMicros = 0;
 
 void uartTransmit(uint8_t uart, uint8_t *pBuffer, uint8_t length)
 {
-    while (micros() - prevSerialRxMicros < 140)
-    {
-    }
+
     for (uint8_t i = 0; i < length; i++)
     {
         srxl2port.write(pBuffer[i]);
     }
     srxl2port.flush();
+    Serial.print("Tx:");
+    Serial.println(millis());
     for (uint8_t i = 0; i < length; i++)
     {
         Serial.print(pBuffer[i], HEX);
         Serial.print(" ");
     }
-    Serial.println("");
-    Serial.println(millis());
+    Serial.println("\n");
+
     prevUartMicros = micros();
 }
 
@@ -96,7 +96,6 @@ void setup()
 
 void loop()
 {
-    digitalWrite(LEDPin, false);
 
     if (millis() - prevSerialRxMillis > SRXL2_FRAME_TIMEOUT)
     {
@@ -124,11 +123,19 @@ void loop()
             uint8_t packetLength = rxBuffer[2];
             if (rxBufferIndex >= packetLength)
             {
-                digitalWrite(LEDPin, true);
 
                 // Try to parse SRXL packet -- this internally calls srxlRun() after packet is parsed and reset timeout
                 if (srxlParsePacket(0, rxBuffer, packetLength))
                 {
+                    Serial.print("Rx: ");
+                    Serial.println(millis());
+                    for (uint8_t i = 0; i < packetLength; i++)
+                    {
+                        Serial.print(rxBuffer[i], HEX);
+                        Serial.print(" ");
+                    }
+                    Serial.println("\n");
+
                     // Move any remaining bytes to beginning of buffer (usually 0)
                     rxBufferIndex -= packetLength;
                     memmove(rxBuffer, &rxBuffer[packetLength], rxBufferIndex);
@@ -188,5 +195,5 @@ void userProvidedReceivedChannelData(SrxlChannelData *pChannelData, bool isFails
     servoB_12bit = srxlChData.values[1] >> 4; */
 
     //Output throttle command converted from 16 to 10 bit;
-    Serial.println(srxlChData.values[0] >> 6);
+    //Serial.println(srxlChData.values[0] >> 6);
 }

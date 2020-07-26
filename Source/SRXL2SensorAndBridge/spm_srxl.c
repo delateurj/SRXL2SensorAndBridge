@@ -652,7 +652,6 @@ void srxlSend(SrxlBus *pBus, SRXL_CMD srxlCmd, uint8_t replyID)
     pBus->srxlOut.raw[pBus->srxlOut.header.length - 1] = crc & 0xFF;
 
     // Send the packet out over the assigned UART
-    serialDebug("uart tx");
     srxlSendOnUart(pBus->uart, pBus->srxlOut.raw, pBus->srxlOut.header.length);
 }
 
