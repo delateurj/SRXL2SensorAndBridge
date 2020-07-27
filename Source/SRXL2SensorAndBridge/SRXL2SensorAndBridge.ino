@@ -43,6 +43,8 @@ uint8_t rxBufferIndex = 0;
 unsigned long prevSerialRxMillis = 0;
 unsigned long prevSerialRxMicros = 0;
 unsigned long prevUartMicros = 0;
+unsigned long timeLastPacketParse = 0;
+unsigned long loopStartTime = 0;
 
 void uartTransmit(uint8_t uart, uint8_t *pBuffer, uint8_t length)
 {
@@ -52,14 +54,17 @@ void uartTransmit(uint8_t uart, uint8_t *pBuffer, uint8_t length)
         srxl2port.write(pBuffer[i]);
     }
     srxl2port.flush();
+    unsigned long timeAtTx = micros();
     Serial.print("Tx:");
-    Serial.println(millis());
+    Serial.println(timeAtTx);
     for (uint8_t i = 0; i < length; i++)
     {
         Serial.print(pBuffer[i], HEX);
         Serial.print(" ");
     }
-    Serial.println("\n");
+    Serial.println("");
+    Serial.println("");
+    ;
 
     prevUartMicros = micros();
 }
@@ -81,6 +86,11 @@ void setup()
     //Initialize usb port for debugging...baud doesn't matter as it negotiates
     //rate on startup
     Serial.begin(9600);
+
+    while (millis() < 2000)
+    {
+    }
+
     // Initialize uart port which we are using Serial1 on Teensy
     Serial1.begin(SRXL2_PORT_BAUDRATE_DEFAULT);
 
@@ -96,21 +106,31 @@ void setup()
 
 void loop()
 {
-
-    if (millis() - prevSerialRxMillis > SRXL2_FRAME_TIMEOUT)
+    loopStartTime = millis();
+    if (loopStartTime - prevSerialRxMillis > SRXL2_FRAME_TIMEOUT)
     {
-        prevSerialRxMillis = millis();
+        prevSerialRxMillis = loopStartTime;
         rxBufferIndex = 0;
         srxlRun(0, SRXL2_FRAME_TIMEOUT);
         //Serial.println(prevSerialRxMillis);
     }
 
+    if (loopStartTime - timeLastPacketParse > 1000)
+    {
+        digitalWrite(LEDPin, false);
+    }
+    else
+    {
+        digitalWrite(LEDPin, true);
+    }
+
     if (srxl2port.available())
     {
 
-        prevSerialRxMillis = millis();
-        prevSerialRxMicros = micros();
+        prevSerialRxMillis = loopStartTime;
+
         unsigned char c = srxl2port.read();
+
         rxBuffer[rxBufferIndex++] = c;
     }
 
@@ -119,22 +139,24 @@ void loop()
 
         if (rxBuffer[0] == SPEKTRUM_SRXL_ID)
         {
-            digitalWrite(LEDPin, true);
             uint8_t packetLength = rxBuffer[2];
             if (rxBufferIndex >= packetLength)
             {
+                timeLastPacketParse = loopStartTime;
 
                 // Try to parse SRXL packet -- this internally calls srxlRun() after packet is parsed and reset timeout
                 if (srxlParsePacket(0, rxBuffer, packetLength))
                 {
-                    Serial.print("Rx: ");
-                    Serial.println(millis());
+                    unsigned long timeAtRx = micros();
+                    Serial.print("Rx:");
+                    Serial.println(timeAtRx);
                     for (uint8_t i = 0; i < packetLength; i++)
                     {
                         Serial.print(rxBuffer[i], HEX);
                         Serial.print(" ");
                     }
-                    Serial.println("\n");
+                    Serial.println("");
+                    Serial.println("");
 
                     // Move any remaining bytes to beginning of buffer (usually 0)
                     rxBufferIndex -= packetLength;
