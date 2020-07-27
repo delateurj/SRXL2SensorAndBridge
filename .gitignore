@@ -1,7 +1,7 @@
 ### VisualStudioCode ###
 .vscode/*
 *.code-workspace
-
+serialLog.txt
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
 .history
