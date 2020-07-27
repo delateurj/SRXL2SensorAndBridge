@@ -50,7 +50,7 @@ void serialDebug(char message[20]);
 //    Smart ESC = 0x40
 //    VTX = 0x81
 // NOTE: This value is not used internally -- it is passed as a parameter to srxlInit() in the example app
-#define SRXL_DEVICE_ID 0x30
+#define SRXL_DEVICE_ID 0x40
 
 // Set this to the desired priority level for sending telemetry, ranging from 0 to 100.
 // Generally, this number should be 10 times the number of different telemetry packets to regularly send.

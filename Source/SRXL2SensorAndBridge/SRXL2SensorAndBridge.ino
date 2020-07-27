@@ -45,27 +45,36 @@ unsigned long prevSerialRxMicros = 0;
 unsigned long prevUartMicros = 0;
 unsigned long timeLastPacketParse = 0;
 unsigned long loopStartTime = 0;
+unsigned int timeAtRx = 0;
+unsigned int rxCount = 0;
+unsigned int txCount = 0;
+unsigned int rxOrTxCount = 0;
 
 void uartTransmit(uint8_t uart, uint8_t *pBuffer, uint8_t length)
 {
+    unsigned int timeAtTx = micros();
 
     for (uint8_t i = 0; i < length; i++)
     {
         srxl2port.write(pBuffer[i]);
     }
     srxl2port.flush();
-    unsigned long timeAtTx = micros();
-    Serial.print("Tx:");
-    Serial.println(timeAtTx);
+
+    char formattedValue[5];
+    rxOrTxCount++;
+    Serial.print("TX,");
+    sprintf(formattedValue, "%4u", rxOrTxCount);
+    Serial.print(formattedValue);
+    Serial.print(",");
+    sprintf(formattedValue, "%9u", timeAtTx);
+    Serial.print(formattedValue);
     for (uint8_t i = 0; i < length; i++)
     {
-        Serial.print(pBuffer[i], HEX);
-        Serial.print(" ");
+        Serial.print(",");
+        sprintf(formattedValue, "%3X", pBuffer[i]);
+        Serial.print(formattedValue);
     }
     Serial.println("");
-    Serial.println("");
-    ;
-
     prevUartMicros = micros();
 }
 
@@ -85,11 +94,11 @@ void setup()
     pinMode(LEDPin, OUTPUT);
     //Initialize usb port for debugging...baud doesn't matter as it negotiates
     //rate on startup
-    Serial.begin(9600);
 
-    while (millis() < 2000)
+    while (millis() < 1000)
     {
     }
+    Serial.begin(9600);
 
     // Initialize uart port which we are using Serial1 on Teensy
     Serial1.begin(SRXL2_PORT_BAUDRATE_DEFAULT);
@@ -147,17 +156,22 @@ void loop()
                 // Try to parse SRXL packet -- this internally calls srxlRun() after packet is parsed and reset timeout
                 if (srxlParsePacket(0, rxBuffer, packetLength))
                 {
-                    unsigned long timeAtRx = micros();
-                    Serial.print("Rx:");
-                    Serial.println(timeAtRx);
+                    char formattedValue[5];
+                    timeAtRx = micros();
+                    rxOrTxCount++;
+                    Serial.print("RX,");
+                    sprintf(formattedValue, "%4u", rxOrTxCount);
+                    Serial.print(formattedValue);
+                    Serial.print(",");
+                    sprintf(formattedValue, "%9u", timeAtRx);
+                    Serial.print(formattedValue);
                     for (uint8_t i = 0; i < packetLength; i++)
                     {
-                        Serial.print(rxBuffer[i], HEX);
-                        Serial.print(" ");
+                        Serial.print(",");
+                        sprintf(formattedValue, "%3X", rxBuffer[i]);
+                        Serial.print(formattedValue);
                     }
                     Serial.println("");
-                    Serial.println("");
-
                     // Move any remaining bytes to beginning of buffer (usually 0)
                     rxBufferIndex -= packetLength;
                     memmove(rxBuffer, &rxBuffer[packetLength], rxBufferIndex);
