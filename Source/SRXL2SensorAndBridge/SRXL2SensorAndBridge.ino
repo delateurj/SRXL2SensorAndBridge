@@ -95,9 +95,6 @@ void setup()
     //Initialize usb port for debugging...baud doesn't matter as it negotiates
     //rate on startup
 
-    while (millis() < 1000)
-    {
-    }
     Serial.begin(9600);
 
     // Initialize uart port which we are using Serial1 on Teensy
