@@ -28,7 +28,7 @@ SOFTWARE.
 #include "spm_srxl.h"
 
 #define SRXL2_PORT_BAUDRATE_DEFAULT 115200
-#define SRXL2_FRAME_TIMEOUT 22
+#define SRXL2_FRAME_TIMEOUT 50
 
 #define srxl2port Serial1
 // Example external functions -- imagine these are defined in uart.h and implemented in uart.c
@@ -118,7 +118,8 @@ void loop()
         prevSerialRxMillis = loopStartTime;
         rxBufferIndex = 0;
         srxlRun(0, SRXL2_FRAME_TIMEOUT);
-        //Serial.println(prevSerialRxMillis);
+        Serial.print(loopStartTime);
+        Serial.println(": Timeout");
     }
 
     if (loopStartTime - timeLastPacketParse > 1000)

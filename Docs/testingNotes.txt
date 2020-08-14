@@ -1,8 +1,69 @@
-Version:
-Device No.:
-Priority:
-Telemetry Device:
-Core:
-Power Sequence:
-Port Used:
+Version:v.001
+Device No.:30
+Priority:10
+Telemetry Device:0x7E
+RX: AR637T
+TX: Dx9
+Core: Teensy 3.1/3.2
+Power Sequence: Tx then rx/teensy simultanseus (Teensy power connected to port 6 of rx)
+Auto-configure previously done?: No
+Port Used: 4 pin srxl2
+Log File Name(s):test001.txt
+Repeatability: High, 8 times in a row, same result.  Have not seen different result.
+Results Summary:
+Logging via Serial usb port has some issues.  Comm #8 doesn't print new line.  
+Comms 9-140 don't arrive to monitor.
+Order of rx and tx's are not correct to what actually happened.  For example:
+Comm 4 actually happened before Comm 3 which is Teensy's reply to Comm 4.
+We also have the general problem that every Teensy TX will show up as an RX as the TX and RX lines are connected.
+
+After 346ms Teensy sends handshake.
+RX replies within 5ms.
+Teensy sends its device info
+RX starts sending handshakes starting with device id 21, then 30 (we don't reply), rest is lost in usb comm issue.
+
+At 1884 ms RX sends what appears to be first cd packet but not clear due to comms issue.  All zeroes
+
+At 6044 ms RX starts sending non zero servo values in CD packets
+
+At 7234,8442,9608,10818,12000 and apprxoximately every 1200 ms Teensy receives CD with matching ID (30) and replies with telemetry
+
+Telemetry connection bars are intermittment...seems to brief flash into connected state with same frequency as Teensy sending telemetry.
+
+
+
+Version:v.001
+Device No.:30
+Priority:10
+Telemetry Device:0x7E
+RX: AR637T
+TX: Dx9
+Core: Teensy 3.1/3.2
+Power Sequence: Tx then rx/teensy simultanseus (Teensy power connected to port 6 of rx)
+Auto-configure previously done?: Yes
+Port Used: 4 pin srxl2
+Log File Name(s):
+Repeatability: High, 8 times in a row, same result.  Have not seen different result.
+
+
 Results:
+Same as above but now get telemetry displaying on transmitter correctly and updating at the 1200ms freq.
+Note: Needed to delete RPM entry by setting to empty prior to auto-config to get data to display.
+Note: RPM is delayed since TX does averaging and takes approximately 30s before it starts to display.
+Assume it take that long to get minimum number of values required by TX algorithmn
+
+Version:v.001
+Device No.:30
+Priority:50
+Telemetry Device:0x7E
+RX: AR637T
+TX: ix20 and dx9
+Core: Teensy 3.1/3.2
+Power Sequence: Tx then rx/teensy simultanseus (Teensy power connected to port 6 of rx)
+Auto-configure previously done?: Yes
+Port Used: 4 pin srxl2
+Log File Name(s):
+Repeatability: High
+
+Results:
+Similar to above for first 8 seconds then get telemetry requests about every 22ms and my device replies but telemetry link to tx is lost on both Dx9 and ix20

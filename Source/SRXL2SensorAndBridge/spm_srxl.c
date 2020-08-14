@@ -686,7 +686,10 @@ bool srxlParsePacket(uint8_t busIndex, uint8_t *packet, uint8_t length)
     // Handle restart with ongoing communications -- bump to run state
     pBus->timeoutCount_ms = 0; // TODO: Should we clear this even if packet isn't valid?
     if (pBus->state < SrxlState_Running && pRx->header.packetType != SRXL_HANDSHAKE_ID)
+    {
         pBus->state = SrxlState_Running;
+        serialDebug("Hi there again");
+    }
 
     // Parse the specific data
     switch (pRx->header.packetType)
@@ -871,6 +874,8 @@ bool srxlParsePacket(uint8_t busIndex, uint8_t *packet, uint8_t length)
             }
             else
             {
+                serialDebug("Hi there");
+
                 pBus->state = SrxlState_ListenForHandshake;
             }
         }
