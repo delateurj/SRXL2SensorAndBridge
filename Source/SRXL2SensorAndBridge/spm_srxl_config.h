@@ -59,7 +59,7 @@ void serialDebug(char message[20]);
 // For example, if you had two normal priority messages and one that you plan to send twice as often as those,
 // you could set the priority to 40 (10 + 10 + 2*10)
 // NOTE: This value is not used internally -- it is passed as a parameter to srxlInit() in the example app
-#define SRXL_DEVICE_PRIORITY 50
+#define SRXL_DEVICE_PRIORITY 10
 
 // Set these information bits based on the capabilities of the device.
 // The only bit currently applicable to third-party devices is the SRXL_DEVINFO_FWD_PROG_SUPPORT flag,

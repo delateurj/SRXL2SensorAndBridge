@@ -966,6 +966,11 @@ bool srxlParsePacket(uint8_t busIndex, uint8_t *packet, uint8_t length)
     }
     case SRXL_TELEM_ID: // 0x80
     {
+        //ToDo: Handle echo more gracefully.  For now assume all telemetry packets are just our echo
+        //and ignore
+        serialDebug("Assume echo");
+        return false;
+
         if (length < sizeof(SrxlTelemetryPacket))
             return false;
 
@@ -981,6 +986,8 @@ bool srxlParsePacket(uint8_t busIndex, uint8_t *packet, uint8_t length)
             pBus->requestID = pBus->rxDevCount > 1 ? pBus->fullID.deviceID : 0xFF;
             pBus->state = SrxlState_SendHandshake;
         }
+        // Otherwise for now just assume its our echo and ignore
+
         // If the incoming telemetry is destined for us, then we need to figure out who should send it over RF
         else if (pTelem->destDevID == pBus->fullID.deviceID)
         {
