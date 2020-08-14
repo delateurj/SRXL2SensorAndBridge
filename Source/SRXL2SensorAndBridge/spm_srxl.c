@@ -817,6 +817,11 @@ bool srxlParsePacket(uint8_t busIndex, uint8_t *packet, uint8_t length)
 
         // If this is an unprompted handshake (dest == 0) from a higher device ID, then we're the master
         SrxlHandshakeData *pHandshake = &(pRx->handshake.payload);
+        if (pHandshake->srcDevID == pBus->fullID.deviceID)
+        {
+            serialDebug("Ignore echo");
+            return false;
+        }
         if ((pHandshake->destDevID == 0) && (pHandshake->srcDevID > pBus->fullID.deviceID))
         {
             // Send a reply immediately to get the slave to shut up
